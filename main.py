@@ -138,6 +138,15 @@ class LinkedList:
             new_link = Link(value, next_link)
             temp.set_link(new_link)
 
+    def print_linked_list_from_head(self):
+        print(self.head.get_value())
+        self.print_linked_list(self.head.get_link())
+
+    def print_linked_list(self, link):
+        if link is not None:
+            print(link.get_value())
+            self.print_linked_list(link.get_link())
+
 
 class Queue:
 
