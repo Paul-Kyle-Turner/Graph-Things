@@ -239,11 +239,39 @@ class Vertex:
         return self.distance
 
 
+class AdjacentList:
+
+    def __init__(self):
+        self.adj_list = []
+
+    def new_list(self):
+        self.adj_list.append([])
+
+    def new_edge(self, index, vertex, weight):
+        self.adj_list[index].append([vertex, weight])
+
+    def get_adjacent_vertex(self, index):
+        vertex_list = []
+        for vert in self.adj_list[index]:
+            vertex_list.append(vert[0])
+        return vertex_list
+
+    def print(self):
+        i = 0
+        for ind in self.adj_list:
+            print(f'STARTING WITH INDEX {i}')
+            for inner in ind:
+                print(inner[0].get_vertex_index())
+                print(inner[0].get_vertex_signifier())
+                print(f'Edge weight {inner[1]}')
+            i += 1
+
+
 class Graph:
 
     def __init__(self, file_path, signifier_index=None):
         self.adj_matrix = self.adjacent_matrix_from_file(file_path, signifier_index)
-        self.adj_list = []
+        self.adj_list = AdjacentList()
         self.vertexes = []
         self.adjacent_list_from_file(file_path, signifier_index)
         self._time = 0
@@ -285,23 +313,17 @@ class Graph:
             i = 0
             for line in file.readlines():
                 line_list = line.strip('\n').split(',')
-                self.adj_list.append([])
+                self.adj_list.new_list()
                 if signify_index is not None:
                     self.vertexes[i].set_vertex_signifier(line_list.pop(signify_index))
                 for k in range(n):
                     if int(line_list[k]) != 0:
-                        self.adj_list[i].append(self.vertexes[k])
+                        self.adj_list.new_edge(i, self.vertexes[k], int(line_list[k]))
                 i += 1
         return self.adj_list
 
     def print_adj_list(self):
-        i = 0
-        for ind in self.adj_list:
-            print(f'STARTING WITH INDEX {i}')
-            for inner in ind:
-                print(inner.get_vertex_index())
-                print(inner.get_vertex_signifier())
-            i += 1
+        self.adj_list.print()
 
     def print_adj_matrix(self):
         print(self.adj_matrix)
@@ -313,7 +335,7 @@ class Graph:
         return None
 
     def get_adjacent_vert(self, index):
-        return self.adj_list[index]
+        return self.adj_list.get_adjacent_vertex(index)
 
     def breadth_first_search(self, signifier):
         take_vert = None
@@ -401,8 +423,8 @@ class Graph:
 
 
 if __name__ == '__main__':
-    graph = Graph('graph226.txt', 0)
-    #graph.breadth_first_search('u')
-    graph.depth_first_search()
-    #graph.print_vert_bfs()
-    graph.print_vert_dfs()
+    graph = Graph('graph23.txt', 0)
+    graph.breadth_first_search('u')
+    #graph.depth_first_search()
+    graph.print_vert_bfs()
+    #graph.print_vert_dfs()
