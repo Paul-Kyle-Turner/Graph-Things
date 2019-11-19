@@ -355,16 +355,24 @@ class Graph:
     def simple_vert_print(self):
         print(self.vertexes)
 
-    def depth_first_search(self):
+    def topographical_sort(self):
+        linked_list = LinkedList()
+        self.depth_first_search(linked_list)
+        return linked_list
+
+    def depth_first_search(self, linked_list=None):
         for vert in self.vertexes:
             vert.set_color('white')
             vert.set_prior(None)
         self.set_time_zero()
         for vert in self.vertexes:
             if vert.get_color() == 'white':
-                self.depth_first_visit(vert)
+                if linked_list is None:
+                    self.depth_first_visit(vert, linked_list)
+                else:
+                    self.depth_first_search(vert)
 
-    def depth_first_visit(self, vertex):
+    def depth_first_visit(self, vertex, linked_list=None):
         vertex.set_distance(self.time_plus_one())
         vertex.set_color('gray')
         for vert in self.get_adjacent_vert(vertex.get_vertex_index()):
@@ -373,6 +381,8 @@ class Graph:
                 self.depth_first_visit(vert)
         vertex.set_color('black')
         vertex.set_vertex_end_time(self.time_plus_one())
+        if linked_list is not None:
+            linked_list.insert_at_head(vertex)
 
     def print_vert_dfs(self):
         for vertex in self.vertexes:
