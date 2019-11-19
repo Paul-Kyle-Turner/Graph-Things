@@ -89,63 +89,73 @@ class Heap:
 
 class Link:
 
-    def __init__(self, value, link=None):
+    def __init__(self, value, head_link=None, tail_link=None):
         self.value = value
-        self.link = link
+        self.head_link = head_link
+        self.tail_link = tail_link
 
-    def set_link(self, link):
-        self.link = link
+    def set_head_link(self, link):
+        self.head_link = link
+
+    def set_tail_link(self, link):
+        self.tail_link = link
 
     def get_value(self):
         return self.value
 
-    def get_link(self):
-        return self.link
+    def get_tail_link(self):
+        return self.tail_link
+
+    def get_head_link(self):
+        return self.head_link
 
 
 class LinkedList:
 
-    def __init__(self, head=None):
-        self.head = None
+    def __init__(self, head=None, tail=None):
+        self.head = head
+        self.tail = tail
         self.length = 0
 
     def insert_at_head(self, value):
         self.head = Link(value, self.head)
         self.length += 1
+        if self.length == 1:
+            self.tail = self.head
 
     def get_length(self):
         return self.length
 
     def pop_head(self):
         temp = self.head
-        self.head = self.head.get_link()
+        self.head = self.head.get_tail_link()
         self.length -= 1
+        if self.length == 0:
+            self.tail = None
         return temp
 
     def get_item_at_pos(self, pos):
         temp = self.head
         if pos < self.length:
             for i in range(pos):
-                temp = temp.get_link()
+                temp = temp.get_tail_link()
             return temp.get_value()
 
     def inset_item_at_pos(self, value, pos):
+        self.length += 1
         temp = self.head
         if pos < self.length:
             for i in range(pos - 1):
-                temp = temp.get_link()
-            next_link = temp.get_link()
-            new_link = Link(value, next_link)
-            temp.set_link(new_link)
+                temp = temp.get_tail_link()
+            new_link = Link(value, temp.get_head_link, temp)
+            temp.set_head_link(new_link)
+            temp.get_head_link().set_tail_link(new_link)
 
-    def print_linked_list_from_head(self):
-        print(self.head.get_value())
-        self.print_linked_list(self.head.get_link())
-
-    def print_linked_list(self, link):
-        if link is not None:
-            print(link.get_value())
-            self.print_linked_list(link.get_link())
+    def print_linked_list(self):
+        temp = self.head
+        for i in range(self.length):
+            print(temp.get_value())
+            temp = temp.get_tail_link()
 
 
 class Queue:
@@ -255,6 +265,9 @@ class AdjacentList:
         for vert in self.adj_list[index]:
             vertex_list.append(vert[0])
         return vertex_list
+
+    def get_adjacent_vertex_edges(self, index):
+        return self.adj_list[index]
 
     def print(self):
         i = 0
@@ -420,6 +433,8 @@ class Graph:
             print(f'Vertex sig {sig}.\n'
                   f'    Vertex color {color},'
                   f' prior {prior}, start_time {distance}, finish_time {time}')
+
+
 
 
 if __name__ == '__main__':
