@@ -261,9 +261,9 @@ class AdjacentList:
         for ind in self.adj_list:
             print(f'STARTING WITH INDEX {i}')
             for inner in ind:
-                print(inner[0].get_vertex_index())
-                print(inner[0].get_vertex_signifier())
-                print(f'Edge weight {inner[1]}')
+                print(f'Vertex index {inner[0].get_vertex_index()}')
+                print(f'Vertex signify {inner[0].get_vertex_signifier()}')
+                print(f'Edge weight {inner[1]}\n')
             i += 1
 
 
@@ -424,7 +424,8 @@ class Graph:
 
 if __name__ == '__main__':
     graph = Graph('graph23.txt', 0)
-    graph.breadth_first_search('u')
+    #graph.breadth_first_search('u')
     #graph.depth_first_search()
-    graph.print_vert_bfs()
+    #graph.print_vert_bfs()
     #graph.print_vert_dfs()
+    graph.print_adj_list()
