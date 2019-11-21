@@ -1,0 +1,209 @@
+Problem 22.2-2
+Breadth-First-Search using vertex 'u' as starting vertex
+Vertex sig r.
+    Vertex color black, distance 4, prior s
+Vertex sig s.
+    Vertex color black, distance 3, prior w
+Vertex sig t.
+    Vertex color black, distance 1, prior u
+Vertex sig u.
+    Vertex color black, distance 0, prior None
+Vertex sig v.
+    Vertex color black, distance 5, prior r
+Vertex sig w.
+    Vertex color black, distance 2, prior t
+Vertex sig x.
+    Vertex color black, distance 1, prior u
+Vertex sig y.
+    Vertex color black, distance 1, prior u
+
+
+Problem 22.3-2
+Depth-First-Search, I am not sure what classification of edges means however I believe that the color
+is the classification of the edges.
+Vertex sig q.
+    Vertex color black, prior None, start_time 1, finish_time 14
+Vertex sig r.
+    Vertex color black, prior None, start_time 15, finish_time 20
+Vertex sig s.
+    Vertex color black, prior q, start_time 2, finish_time 7
+Vertex sig t.
+    Vertex color black, prior q, start_time 8, finish_time 13
+Vertex sig u.
+    Vertex color black, prior r, start_time 16, finish_time 19
+Vertex sig v.
+    Vertex color black, prior s, start_time 3, finish_time 6
+Vertex sig w.
+    Vertex color black, prior v, start_time 4, finish_time 5
+Vertex sig x.
+    Vertex color black, prior t, start_time 9, finish_time 12
+Vertex sig y.
+    Vertex color black, prior u, start_time 17, finish_time 18
+Vertex sig z.
+    Vertex color black, prior x, start_time 10, finish_time 11
+
+
+Problem 22.4-1
+Topological sort of graph 22.8, only output for this is the linked list of vertex signifiers.
+n -> q -> m -> x -> p -> o -> s -> r -> y -> v -> w -> z -> u -> t
+
+
+Problem 23.2-4
+Edges are 1
+parents
+[1, 9, 1, 0, 1, 0, 1, 1, 1, 9, 9, 0, 1, 1]
+ranks
+[1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0]
+sizes
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0]
+Edges are random
+parents
+[Vertex at pos 1, Vertex at pos 1, Vertex at pos 1, Vertex at pos 0, Vertex at pos 1, Vertex at pos 0, Vertex at pos 1, Vertex at pos 1, Vertex at pos 1, Vertex at pos 9, Vertex at pos 10, Vertex at pos 0, Vertex at pos 1, Vertex at pos 1]
+ranks
+[1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+sizes
+[0, 12, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0]
+
+
+Prim's algorithm
+Prim's algorithm with the use of a priority queue will run in the time of O((|V| + |E|)log(|V|))
+This is because of the priority queue will be called V times to Extract the Min of the queue.
+If the use of a normal array however there will be |E| runtime on finding the min edge per each vector.
+This then applies that if the graph is sparely populated |E| will estimate to |V| and therefore run at
+O(|V|), however if the graph is dense and the estimated |E| is close to |V^2| then the runtime will be
+O(|V^2|) thus if a sparse graph is used, a normal array would run faster then the priority queue.
+
+
+Problem 24.1-1
+This is run 1.
+Vertex at index 0, with signifier s.
+Prior vertex : Vertex at pos 4, with distance 2.
+
+Vertex at index 1, with signifier t.
+Prior vertex : None, with distance inf.
+
+Vertex at index 2, with signifier x.
+Prior vertex : Vertex at pos 4, with distance 7.
+
+Vertex at index 3, with signifier y.
+Prior vertex : None, with distance inf.
+
+Vertex at index 4, with signifier z.
+Prior vertex : None, with distance 0.
+
+This is run 2.
+Vertex at index 0, with signifier s.
+Prior vertex : Vertex at pos 4, with distance 2.
+
+Vertex at index 1, with signifier t.
+Prior vertex : Vertex at pos 2, with distance 5.
+
+Vertex at index 2, with signifier x.
+Prior vertex : Vertex at pos 3, with distance 6.
+
+Vertex at index 3, with signifier y.
+Prior vertex : Vertex at pos 0, with distance 9.
+
+Vertex at index 4, with signifier z.
+Prior vertex : None, with distance 0.
+
+This is run 3.
+Vertex at index 0, with signifier s.
+Prior vertex : Vertex at pos 4, with distance 2.
+
+Vertex at index 1, with signifier t.
+Prior vertex : Vertex at pos 2, with distance 4.
+
+Vertex at index 2, with signifier x.
+Prior vertex : Vertex at pos 3, with distance 6.
+
+Vertex at index 3, with signifier y.
+Prior vertex : Vertex at pos 0, with distance 9.
+
+Vertex at index 4, with signifier z.
+Prior vertex : None, with distance 0.
+
+This is run 4.
+Vertex at index 0, with signifier s.
+Prior vertex : Vertex at pos 4, with distance 2.
+
+Vertex at index 1, with signifier t.
+Prior vertex : Vertex at pos 2, with distance 4.
+
+Vertex at index 2, with signifier x.
+Prior vertex : Vertex at pos 3, with distance 6.
+
+Vertex at index 3, with signifier y.
+Prior vertex : Vertex at pos 0, with distance 9.
+
+Vertex at index 4, with signifier z.
+Prior vertex : None, with distance 0.
+
+True
+
+Change edge (z, x) to 4
+This is run 1.
+Vertex at index 0, with signifier s.
+Prior vertex : None, with distance 0.
+
+Vertex at index 1, with signifier t.
+Prior vertex : Vertex at pos 0, with distance 6.
+
+Vertex at index 2, with signifier x.
+Prior vertex : Vertex at pos 3, with distance 4.
+
+Vertex at index 3, with signifier y.
+Prior vertex : Vertex at pos 0, with distance 7.
+
+Vertex at index 4, with signifier z.
+Prior vertex : Vertex at pos 1, with distance 2.
+
+This is run 2.
+Vertex at index 0, with signifier s.
+Prior vertex : None, with distance 0.
+
+Vertex at index 1, with signifier t.
+Prior vertex : Vertex at pos 2, with distance 2.
+
+Vertex at index 2, with signifier x.
+Prior vertex : Vertex at pos 3, with distance 4.
+
+Vertex at index 3, with signifier y.
+Prior vertex : Vertex at pos 0, with distance 7.
+
+Vertex at index 4, with signifier z.
+Prior vertex : Vertex at pos 1, with distance 2.
+
+This is run 3.
+Vertex at index 0, with signifier s.
+Prior vertex : None, with distance 0.
+
+Vertex at index 1, with signifier t.
+Prior vertex : Vertex at pos 2, with distance 2.
+
+Vertex at index 2, with signifier x.
+Prior vertex : Vertex at pos 3, with distance 4.
+
+Vertex at index 3, with signifier y.
+Prior vertex : Vertex at pos 0, with distance 7.
+
+Vertex at index 4, with signifier z.
+Prior vertex : Vertex at pos 1, with distance -2.
+
+This is run 4.
+Vertex at index 0, with signifier s.
+Prior vertex : None, with distance 0.
+
+Vertex at index 1, with signifier t.
+Prior vertex : Vertex at pos 2, with distance 2.
+
+Vertex at index 2, with signifier x.
+Prior vertex : Vertex at pos 3, with distance 4.
+
+Vertex at index 3, with signifier y.
+Prior vertex : Vertex at pos 0, with distance 7.
+
+Vertex at index 4, with signifier z.
+Prior vertex : Vertex at pos 1, with distance -2.
+
+True
