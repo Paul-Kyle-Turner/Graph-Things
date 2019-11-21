@@ -119,6 +119,15 @@ class VertexHeap(Heap):
     def in_heap(self, vertex):
         return vertex in self.heap
 
+    def change_key(self, index, key):
+        if index < len(self.heap):
+            self.heap[index].set_distance(key)
+            while index > 0 and self.parent(index) > self.heap[index]:
+                self.heap[index], self.heap[self.parent_index(index)] = self.parent(index), self.heap[index]
+                index = self.parent_index(index)
+            self.perc_down_min(index)
+
+
 class Link:
 
     def __init__(self, value, head_link=None, tail_link=None):
@@ -162,10 +171,11 @@ class LinkedList:
         return self.head
 
     def insert_at_head(self, value):
-        self.head = Link(value, self.head)
+        temp = self.head
+        self.head = Link(value, None, self.head)
         self.length += 1
         if self.length == 1:
-            self.tail = self.head
+            self.tail = temp
 
     def get_length(self):
         return self.length
@@ -448,6 +458,12 @@ class AdjacentList:
     def get_adjacent_vertex_edges(self, index):
         return self.adj_list[index]
 
+    def change_weight(self, index, vertex_signifier, weight):
+        temp = self.adj_list[index]
+        for ind in temp:
+            if ind[0].get_vertex_signifier() == vertex_signifier:
+                ind[1] = weight
+
     def print(self):
         i = 0
         for ind in self.adj_list:
@@ -576,10 +592,22 @@ class Graph:
         for vert in self.vertexes:
             print(vert.get_vertex_signifier())
 
-    def topographical_sort(self):
+    def topological_sort(self):
         linked_list = LinkedList()
         self.depth_first_search(linked_list)
         return linked_list
+
+    def print_topological_sort(self):
+        temp_string = ''
+        linked_list = self.topological_sort()
+        original_len = linked_list.get_length()
+        for i in range(original_len):
+            temp = linked_list.pop_head()
+            temp_string = temp_string + f'{temp.get_value().get_vertex_signifier()}'
+            if i != original_len - 1:
+                temp_string = temp_string + ' -> '
+        print(temp_string)
+        return temp_string
 
     def depth_first_search(self, linked_list=None):
         for vert in self.vertexes:
@@ -588,10 +616,10 @@ class Graph:
         self.set_time_zero()
         for vert in self.vertexes:
             if vert.get_color() == 'white':
-                if linked_list is None:
+                if linked_list is not None:
                     self.depth_first_visit(vert, linked_list)
                 else:
-                    self.depth_first_search(vert)
+                    self.depth_first_visit(vert)
 
     def depth_first_visit(self, vertex, linked_list=None):
         vertex.set_distance(self.time_plus_one())
@@ -599,7 +627,10 @@ class Graph:
         for vert in self.get_adjacent_vert(vertex.get_vertex_index()):
             if vert.get_color() == 'white':
                 vert.set_prior(vertex)
-                self.depth_first_visit(vert)
+                if linked_list is not None:
+                    self.depth_first_visit(vert, linked_list)
+                else:
+                    self.depth_first_visit(vert)
         vertex.set_color('black')
         vertex.set_vertex_end_time(self.time_plus_one())
         if linked_list is not None:
@@ -630,7 +661,7 @@ class Graph:
     @staticmethod
     def relax(from_vector, to_vector, weight):
         if to_vector.get_distance() > from_vector.get_distance() + weight:
-            to_vector = from_vector + weight
+            to_vector.set_distance(from_vector.get_distance() + weight)
             to_vector.set_prior(from_vector)
 
     def gather_edges_in_list(self):
@@ -710,29 +741,79 @@ class Graph:
             print(f'Vertex at index {vert.get_vertex_index()}, with signifier {vert.get_vertex_signifier()}.')
             print(f'Prior vertex : {vert.get_prior()}, with distance {vert.get_distance()}.\n')
 
-    def bellman_ford(self, vertex_signifier, print=False):
+    def bellman_ford(self, vertex_signifier, print_it=False):
         self.init_single_source(vertex_signifier)
         edges = self.gather_edges_in_list()
         for i in range(len(self.vertexes) - 1):
             for edge in edges:
                 self.relax(edge[0], edge[1], edge[2])
-                if print:
-                    self.print_vertex_full()
+            if print_it:
+                print(f'This is run {i + 1}.')
+                self.print_vertex_full()
         for edge in edges:
             if edge[1].get_distance() > edge[0].get_distance() + edge[2]:
                 return False
         return True
 
+    def change_vertex_edge_weight(self, vertex_signifier, vertex_signifier_to, weight):
+        vert = self.get_vertex_with_sig(vertex_signifier).get_vertex_index()
+        self.adj_list.change_weight(vert, vertex_signifier_to, weight)
+
+
+def randomize_graph(file_path):
+    with open(file_path, 'r+') as read_file:
+        with open('new' + file_path, 'w+') as write_file:
+            for line in read_file.readlines():
+                temp_list = line.split(',')
+                for inter in temp_list:
+                    if inter == str(1):
+                        inter.replace('1', str(np.random.randint(0, 10)))
+                sep = ','
+                write_file.write(sep.join(temp_list))
 
 
 if __name__ == '__main__':
+    print('Problem 22.2-2')
+    print('Breadth-First-Search using vertex \'u\' as starting vertex')
+    graph = Graph('graph223.txt', 0)
+    graph.breadth_first_search('u')
+    graph.print_vert_bfs()
+
+    print('\n\nProblem 22.3-2')
+    print('Depth-First-Search, I am not sure what classification of edges means however I believe that the color \n'
+          'is the classification of the edges.')
+    graph = Graph('graph226.txt', 0)
+    graph.depth_first_search()
+    graph.print_vert_dfs()
+
+    print('\n\nProblem 22.4-1')
+    print('Topological sort of graph 22.8, only output for this is the linked list of vertex signifiers.')
     graph = Graph('graph228.txt', 0)
-    #disjoint_set_vert = graph.mst_kruskals()
-    #disjoint_set_vert.print()
-    #graph.simple_vert_print()
-    graph.mst_prims_prio('m')
-    #graph.breadth_first_search('u')
-    #graph.depth_first_search()
-    #graph.print_vert_bfs()
-    #graph.print_vert_dfs()
-    #graph.print_adj_list()
+    graph.print_topological_sort()
+
+    print('\n\nProblem 23.2-4')
+    randomize_graph('graph228.txt')
+    print('Edges are 1')
+    graph = Graph('graph228.txt', 0)
+    graph.mst_kruskals_edge_1().print()
+    print('Edges are random')
+    graph = Graph('newgraph228.txt', 0)
+    graph.mst_kruskals().print()
+
+    print('\n\nPrim\'s algorithm')
+    print('Prim\'s algorithm with the use of a priority queue will run in the time of O((|V| + |E|)log(|V|))\n'
+          'This is because of the priority queue will be called V times to Extract the Min of the queue.\n'
+          'If the use of a normal array however there will be |E| runtime on finding the min edge per each vector.\n'
+          'This then applies that if the graph is sparely populated |E| will estimate to |V| and therefore run at\n'
+          'O(|V|), however if the graph is dense and the estimated |E| is close to |V^2| then the runtime will be'
+          '\nO(|V^2|) thus if a sparse graph is used, a normal array would run faster then the priority queue.')
+
+    print('\n\nProblem 24.1-1')
+    graph = Graph('graph244.txt', 0)
+    does_work = graph.bellman_ford('z', print_it=True)
+    print(does_work)
+
+    print('\nChange edge (z, x) to 4')
+    graph.change_vertex_edge_weight('z', 't', 4)
+    does_work = graph.bellman_ford('s', print_it=True)
+    print(does_work)
