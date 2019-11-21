@@ -75,7 +75,8 @@ class Heap:
 
     def extract_min(self):
         min_element = self.heap[0]
-        self.heap[0] = self.heap.pop(len(self.heap) - 1)
+        self.heap[0] = self.heap[-1]
+        self.heap.pop()
         self.perc_down_min(0)
         return min_element
 
@@ -86,6 +87,37 @@ class Heap:
             self.heap[index], self.heap[self.parent_index(index)] = self.parent(index), self.heap[index]
             index = self.parent_index(index)
 
+    def is_empty(self):
+        return len(self.heap) == 0
+
+    def is_not_empty(self):
+        return len(self.heap) != 0
+
+    def in_heap(self, number):
+        return number in self.heap
+
+
+
+class VertexHeap(Heap):
+
+    def __init__(self, vertexes_edges):
+        super(VertexHeap, self).__init__(vertexes_edges)
+
+    def perc_down_min(self, index):
+        if self.left(index) >= len(self.heap) or self.left_child(index) is not None:
+            if self.right(index) >= len(self.heap) or self.heap[self.right(index)] is None:
+                child_index = self.left(index)
+            elif self.right_child(index).get_distance() < self.left_child(index).get_distance():
+                child_index = self.right(index)
+            else:
+                child_index = self.left(index)
+            if child_index < len(self.heap):
+                if self.heap[child_index].get_distance() < self.heap[index].get_distance():
+                    self.heap[index], self.heap[child_index] = self.heap[child_index], self.heap[index]
+                    self.perc_down_min(child_index)
+
+    def in_heap(self, vertex):
+        return vertex in self.heap
 
 class Link:
 
@@ -116,6 +148,18 @@ class LinkedList:
         self.head = head
         self.tail = tail
         self.length = 0
+
+    def set_head_link(self, link):
+        self.head = link
+
+    def set_tail_link(self, link):
+        self.tail = link
+
+    def get_tail_link(self):
+        return self.tail
+
+    def get_head_link(self):
+        return self.head
 
     def insert_at_head(self, value):
         self.head = Link(value, self.head)
@@ -150,12 +194,133 @@ class LinkedList:
             new_link = Link(value, temp.get_head_link, temp)
             temp.set_head_link(new_link)
             temp.get_head_link().set_tail_link(new_link)
+            if pos == self.length:
+                self.tail = new_link
 
     def print_linked_list(self):
         temp = self.head
         for i in range(self.length):
             print(temp.get_value())
             temp = temp.get_tail_link()
+
+
+class DisjointSet:
+
+    def __init__(self, num_sets=0):
+        self.num_sets = num_sets
+        self.parents = list(range(num_sets))
+        self.ranks = [0] * num_sets
+        self.sizes = [1] * num_sets
+
+    def make_set(self):
+        self.num_sets += 1
+        self.parents.append(len(self.parents))
+        self.ranks.append(0)
+        self.sizes.append(1)
+
+    def find(self, index):
+        if 0 <= index < len(self.parents):
+            pass
+        parent = self.get_parent(index)
+        if parent == index:
+            return index
+        while True:
+            new_parent = self.get_parent(parent)
+            if new_parent == parent:
+                return parent
+            parent = self.get_parent(parent)
+
+    def in_same_set(self, index1, index2):
+        if self.find(index1) == self.find(index2):
+            return True
+        return False
+
+    def get_size_of_set(self, index):
+        return self.sizes[self.find(index)]
+
+    def union(self, index1, index2):
+        set1 = self.find(index1)
+        set2 = self.find(index2)
+        if set1 == set2:
+            return False
+        if self.ranks[set1] == self.ranks[set2]:
+            self.ranks[set1] += 1
+        elif self.ranks[set1] < self.ranks[set2]:
+            self.ranks[set1], self.ranks[set2] = self.ranks[set2], self.ranks[set1]
+
+        self.parents[set2] = set1
+        self.sizes[set1] += self.sizes[set2]
+        self.sizes[set2] = 0
+        self.num_sets -= 1
+        return True
+
+    def get_parent(self, index):
+        return self.parents[index]
+
+    def get_num_sets(self):
+        return self.num_sets
+
+    def print(self):
+        print("parents")
+        print(self.parents)
+        print('ranks')
+        print(self.ranks)
+        print('sizes')
+        print(self.sizes)
+
+
+class DisjointSetVert(DisjointSet):
+
+    def __init__(self, vertex_list=None):
+        if vertex_list is not None:
+            num_sets = len(vertex_list) - 1
+        else:
+            num_sets = 0
+        super().__init__(num_sets)
+        if vertex_list is not None:
+            self.parents = vertex_list
+        else:
+            self.parents = []
+
+    def make_set_vert(self, vert):
+        self.num_sets += 1
+        self.parents.append(vert)
+        self.ranks.append(0)
+        self.sizes.append(1)
+
+    def find(self, index):
+        if 0 <= index < len(self.parents):
+            pass
+        parent = self.get_parent_index(index)
+        if parent == index:
+            return index
+        while True:
+            new_parent = self.get_parent_index(index)
+            if new_parent == parent:
+                return parent
+            parent = self.get_parent_index(index)
+
+    def get_parent_index(self, index):
+        return self.parents[index].get_vertex_index()
+
+    def union(self, index1, index2):
+        set1 = self.find(index1)
+        set2 = self.find(index2)
+        if set1 == set2:
+            return False
+        if self.ranks[set1] == self.ranks[set2]:
+            self.ranks[set1] += 1
+        elif self.ranks[set1] < self.ranks[set2]:
+            self.ranks[set1], self.ranks[set2] = self.ranks[set2], self.ranks[set1]
+
+        self.parents[set2] = self.get_parent(set1)
+        self.sizes[set1] += self.sizes[set2]
+        self.sizes[set2] = 0
+        self.num_sets -= 1
+        return True
+
+    def print(self):
+        super(DisjointSetVert, self).print()
 
 
 class Queue:
@@ -201,6 +366,12 @@ class Vertex:
         self.color = None
         self.distance = 0
         self.end_time = 0
+
+    def __repr__(self):
+        return str('Vertex at pos ' + str(self.get_vertex_index()))
+
+    def __str__(self):
+        return str('Vertex at pos ' + str(self.get_vertex_index()))
 
     def set_breath_search(self, color, distance, prior):
         self.set_color(color)
@@ -260,6 +431,14 @@ class AdjacentList:
     def new_edge(self, index, vertex, weight):
         self.adj_list[index].append([vertex, weight])
 
+    def gather_edges_in_list(self):
+        temp_list = []
+        for ind in range(len(self.adj_list)):
+            for inner in self.adj_list[ind]:
+                inner_list = [ind, inner[0], inner[1]]
+                temp_list.append(inner_list)
+        return temp_list
+
     def get_adjacent_vertex(self, index):
         vertex_list = []
         for vert in self.adj_list[index]:
@@ -287,6 +466,12 @@ class Graph:
         self.adj_list = AdjacentList()
         self.vertexes = []
         self.adjacent_list_from_file(file_path, signifier_index)
+        self._time = 0
+
+    def get_num_vertexes(self):
+        return len(self.vertexes)
+
+    def reset_time(self):
         self._time = 0
 
     def time_plus_one(self):
@@ -343,7 +528,7 @@ class Graph:
 
     def get_vertex_with_sig(self, signifier):
         for vert in self.vertexes:
-            if vert.get_vertex_signifier == signifier:
+            if vert.get_vertex_signifier() == signifier:
                 return vert
         return None
 
@@ -388,7 +573,8 @@ class Graph:
                   f' prior {prior}')
 
     def simple_vert_print(self):
-        print(self.vertexes)
+        for vert in self.vertexes:
+            print(vert.get_vertex_signifier())
 
     def topographical_sort(self):
         linked_list = LinkedList()
@@ -434,13 +620,119 @@ class Graph:
                   f'    Vertex color {color},'
                   f' prior {prior}, start_time {distance}, finish_time {time}')
 
+    def init_single_source(self, vertex_signifier):
+        for vert in self.vertexes:
+            vert.set_distance(math.inf)
+            vert.set_prior(None)
+        vert = self.get_vertex_with_sig(vertex_signifier)
+        vert.set_distance(0)
+
+    @staticmethod
+    def relax(from_vector, to_vector, weight):
+        if to_vector.get_distance() > from_vector.get_distance() + weight:
+            to_vector = from_vector + weight
+            to_vector.set_prior(from_vector)
+
+    def gather_edges_in_list(self):
+        edges = self.adj_list.gather_edges_in_list()
+        for edge in edges:
+            for vert in self.vertexes:
+                if edge[0] == vert.get_vertex_index():
+                    edge[0] = vert
+                    break
+        return edges
+
+    def insertion_sort_edges(self):
+        edges = self.gather_edges_in_list()
+        for i in range(1, len(edges)):
+            key = edges[i]
+            k = i - 1
+            while k >= 0 and key[2] < edges[k][2]:
+                edges[k + 1] = edges[k]
+                k -= 1
+            edges[k + 1] = key
+        return edges
+
+    def mst_kruskals(self):
+        disjoint_set = DisjointSetVert()
+        for vert in self.vertexes:
+            disjoint_set.make_set_vert(vert)
+        edges = self.insertion_sort_edges()
+        vertex_within_set = 0
+        for edge in edges:
+            # my union function checks if the sets are within the same set
+            add_up = disjoint_set.union(edge[0].get_vertex_index(), edge[1].get_vertex_index())
+            if add_up:
+                vertex_within_set += 1
+                if vertex_within_set == len(self.vertexes):
+                    return disjoint_set
+        return disjoint_set
+
+    def mst_kruskals_non_vert(self):
+        disjoint_set = DisjointSet()
+        for vert in self.vertexes:
+            disjoint_set.make_set()
+        edges = self.insertion_sort_edges()
+        for edge in edges:
+            # my union function checks if the sets are within the same set
+            disjoint_set.union(edge[0].get_vertex_index(), edge[1].get_vertex_index())
+        return disjoint_set
+
+    # assumes all edges are one weight
+    def mst_kruskals_edge_1(self):
+        disjoint_set = DisjointSet()
+        for vert in self.vertexes:
+            disjoint_set.make_set()
+        edges = self.insertion_sort_edges()
+        vertex_within_set = 0
+        for edge in edges:
+            # my union function checks if the sets are within the same set
+            add_up = disjoint_set.union(edge[0].get_vertex_index(), edge[1].get_vertex_index())
+            if add_up:
+                vertex_within_set += 1
+                if vertex_within_set == len(self.vertexes):
+                    return disjoint_set
+        return disjoint_set
+
+    # use distance as key value for prio queue
+    def mst_prims_prio(self, vertex_signifier):
+        self.init_single_source(vertex_signifier)
+        priority_queue = VertexHeap(self.vertexes)
+        while priority_queue.is_not_empty():
+            vert = priority_queue.extract_min()
+            for vert_edge in self.adj_list.get_adjacent_vertex_edges(vert.get_vertex_index()):
+                if priority_queue.in_heap(vert_edge[0]) and vert_edge[1] < vert_edge[0].get_distance():
+                    vert_edge[0].set_prior(vert)
+                    vert_edge[0].set_distance(vert_edge[1])
+
+    def print_vertex_full(self):
+        for vert in self.vertexes:
+            print(f'Vertex at index {vert.get_vertex_index()}, with signifier {vert.get_vertex_signifier()}.')
+            print(f'Prior vertex : {vert.get_prior()}, with distance {vert.get_distance()}.\n')
+
+    def bellman_ford(self, vertex_signifier, print=False):
+        self.init_single_source(vertex_signifier)
+        edges = self.gather_edges_in_list()
+        for i in range(len(self.vertexes) - 1):
+            for edge in edges:
+                self.relax(edge[0], edge[1], edge[2])
+                if print:
+                    self.print_vertex_full()
+        for edge in edges:
+            if edge[1].get_distance() > edge[0].get_distance() + edge[2]:
+                return False
+        return True
 
 
 
 if __name__ == '__main__':
-    graph = Graph('graph23.txt', 0)
+    graph = Graph('graph228.txt', 0)
+    #disjoint_set_vert = graph.mst_kruskals()
+    #disjoint_set_vert.print()
+    #graph.simple_vert_print()
+    graph.mst_prims_prio('m')
     #graph.breadth_first_search('u')
     #graph.depth_first_search()
     #graph.print_vert_bfs()
     #graph.print_vert_dfs()
-    graph.print_adj_list()
+    #graph.print_adj_list()
